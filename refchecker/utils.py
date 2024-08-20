@@ -10,6 +10,7 @@ from openai import Timeout as OpenAITimeout
 
 from litellm import batch_completion
 from litellm.types.utils import ModelResponse
+import httpx
 
 # Setup spaCy NLP
 nlp = None
@@ -112,6 +113,9 @@ def get_model_batch_response(
         message_list.append(messages)
     import litellm
     litellm.suppress_debug_info = True
+    # avoid vpn issues
+    litellm.client_session = httpx.Client(http2=True, verify=False)
+    litellm.aclient_session = httpx.AsyncClient(http2=True, verify=False)
     # litellm.drop_params=True
     while True:
         responses = batch_completion(
